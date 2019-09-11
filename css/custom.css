@@ -1,0 +1,8 @@
+@font-face {
+    font-family: "FunnyFont";
+    src: url("font/Safir.ttf");
+}
+header h1{
+    font-family: FunnyFont, Arial, sans-serif;
+    color: #c483d8;
+}
