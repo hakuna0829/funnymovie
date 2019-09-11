@@ -5,13 +5,13 @@ if(isset($_GET['logout'])){
     
     unset($_SESSION['loggedin']);
     session_destroy();
-    header("location: index.php");
-    exit;
+    // header("location: index.php");
+    // exit;
 }
 // echo $_SERVER['REQUEST_URI'];exit;
 // Check if the user is already logged in, if yes then redirect him to welcome page
 
-if( !isset($_SESSION["loggedin"]) && $_SERVER['REQUEST_URI'] != '/index.php' )  {
+if( !isset($_SESSION["loggedin"]) && $_SERVER['REQUEST_URI'] == '/share.php' )  {
     header("location: index.php");
     exit;
 }
@@ -30,7 +30,7 @@ require_once('config.php');
     <link rel="stylesheet" type="text/css" href="css/custom.css">
 </head>
 <body>
-<header>
+<!-- <header> -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="welcome.php"><img src="img/logo_.png" width=150 alt=""></a>
         
@@ -45,6 +45,7 @@ require_once('config.php');
                 <div class="form-inline my-2 my-lg-0">
                     <span>Welcome <?php echo $_SESSION["user_name"].' ('.$_SESSION["user_email"].')' ?></span>&ensp;
                     <a class="btn btn-outline-primary my-2 my-sm-0" href="share.php">Share Movie</a>&ensp;
+                    <a class="btn btn-outline-primary my-2 my-sm-0" href="index.php">Home</a>&ensp;
                     <a class="btn btn-outline-dark my-2 my-sm-0" href="?logout">Log out</a>
                 </div>
             <?php }
@@ -53,12 +54,23 @@ require_once('config.php');
                 <form class="form-inline my-2 my-lg-0" id="signinForm">
                     <input class="form-control mr-sm-2" type="email" id="loginEmail" name="loginEmail" placeholder="Email" aria-label="Email" required>
                     <input class="form-control mr-sm-2" type="password" id="loginPassword"  name="loginPassword" placeholder="Password" aria-label="Password" required>
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="btn_login" name="btn_login">Login</button>
-                    <!-- <a class="btn btn-outline-danger my-2 my-sm-0" href="registeration.php">Sign up</a> -->
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="btn_login" name="btn_login">Login</button>&ensp;
+                    <?php 
+                    if($_SERVER['REQUEST_URI'] != '/signup.php'){ 
+                    ?>
+                        <a class="btn btn-outline-primary my-2 my-sm-0" href="signup.php">Sign up</a>
+                    <?php
+                    }else{
+                    ?>
+                        <a class="btn btn-outline-primary my-2 my-sm-0" href="index.php">Home</a>
+                    <?php
+                    }
+                    ?>
+                    
                 </form>
             <?php 
             }
             ?>
         </div>
     </nav>
-</header>
+<!-- </header> -->

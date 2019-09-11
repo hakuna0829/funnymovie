@@ -1,39 +1,93 @@
 <?php
+
 require_once('header.php');
+require_once('process.php');
 
-if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true && $_SERVER['REQUEST_URI'] != '/welcome.php'){
-    header("location: welcome.php");
-    exit;
-}
 ?>
+<style>
+.span4 img {
+    margin-right: 10px;
+}
+.span4 .img-left {
+    float: left;
+}
+.span4 .img-right {
+    float: right;
+}
+.embed-responsive{
+    margin-right: 10px;
+    float: left;
+}
 
+.padding10{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+</style>
 <div>
-    <form action="index.php" method="post">
-        <div class="container">
-            <div class="row d-flex justify-content-center">
-                <div class="col-sm-3 ">
-                    <h1>Registeration</h1>
-                    <p>Fill up the form</p>
+    <div class="container-fluid" >
+        <?php
+        $movies = getAllMovies($conn);
 
-                    <hr class="mb-3">
-                    <label for="firstName"><b>First Name</b></label>
-                    <input class="form-control" type="text" id="firstName" name="firstName" required>
-
-                    <label for="lasttName"><b>Last Name</b></label>
-                    <input class="form-control" type="text" id="lastName" name="lastName" required>
-
-                    <label for="userEmail"><b>Email Address</b></label>
-                    <input class="form-control" type="email" id="userEmail" name="userEmail" required>
-
-                    <label for="password"><b>Password</b></label>
-                    <input class="form-control" type="password" id="password" name="password" required>
+        if( $movies == true){
+            for($i = 0; $i<count($movies) ; $i++){
+                // var_dump($movies["$i"]);
+?>
+        <div class="row d-flex justify-content-center padding10">
                     
-                    <hr class="mb-3">
-                    <input class="btn btn-primary form-control" type="submit" id="btnRegister" name="register_user" value="Sign up">
-                </div>
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item" src="<?php echo $movies["$i"]['move_link']?>" allowfullscreen></iframe>
+                            
+                        </div>                                
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                    <div class="movie-title"><h3>Movie Title</h3></div>
+                        <div class="movie-author">
+                            <h6>
+                                Shared by: <?php echo $movies["$i"]['userEmail']?>
+                                <?php
+                                 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+                                    ?>
+                                    <img src="img/voteup.png" alt="">
+                                    <img src="img/votedown.png" alt="">
+                                    <span>(un-voted)</span>
+                                    <?php
+                                 }
+                                ?>
+                                
+                            </h6> 
+                            
+                        </div>
+                        <div class="movie-vote">
+                            <span class="voteup"></span>35<a href='#'><img src="img/voteup.png" alt="" width=20></a>
+                            <span class="voteup"></span>5<a href='#'><img src="img/votedown.png" alt="" width=20></a>
+                        </div>
+                        <div class="movie-description"><h6>Description: </h6> </div>
+                        <p>
+                            Donec id elit non mi porta gravida at eget metus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+                            Donec id elit non mi porta gravida at eget metus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+                            Donec id elit non mi porta gravida at eget metus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+                        </p>   
+                    </div>                        
+        
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-sm-12 col-md-12 col-lg-8">
+                <hr>
             </div>
-        </div>   
-    </form>
+        </div>
+       
+<?php
+            }            
+        }else{
+            echo "false";
+        }
+        ?>
+        
+            
+    </div>   
+   
 
 
 </div>
@@ -43,57 +97,59 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true && $_SERVER['R
 
     $(function(){
 
-        $('#btnRegister').click(function(e){
-            
+        $('#btnShare').click(function(e){
             var valid = this.form.checkValidity();
             if(valid){
-            
                 e.preventDefault();
 
-                var firstName   = $('#firstName').val();
-                var lastName    = $('#lastName').val();
-                var userEmail   = $('#userEmail').val();
-                var password    = $('#password').val();
-               
-                $.ajax({
-                    type: 'POST',
-                    url:   'process.php',
-                    dataType: 'json',
-                    data: {firstName:firstName, lastName:lastName, userEmail:userEmail, password:password, register:true},
-                    success: function(data){
+                var youtubeLink   = $('#youtubeLink').val();
+                if(matchYoutubeUrl(youtubeLink)){
+                    $.ajax({
+                        type: 'POST',
+                        url:   'process.php',
+                        dataType: 'json',
+                        data: {youtubeLink:youtubeLink, shared:true},
+                        success: function(data){
 
-                        console.log(data)                        
-                        if(data.type == 2){
+                            console.log(data)                        
+                            if(data.type == 2){
+                                Swal.fire({
+                                    title: 'Done!',
+                                    text: data.msg,
+                                    type: 'success',
+                                
+                                });
+                            }else{
+                                Swal.fire({
+                                    title: 'Failed!',
+                                    text: data.msg,
+                                    type: 'error',                            
+                                });
+                            }
+                            
+                        },
+                        error: function(data){
                             Swal.fire({
-                                title: 'Done!',
-                                text: data.msg,
-                                type: 'success',
+                            title: 'Error!',
+                            text: 'There were errors while saving the data...',
+                            type: 'error'
                             
                             });
-                        }else{
-                            Swal.fire({
-                                title: 'Failed!',
-                                text: data.msg,
-                                type: 'error',                            
-                            });
                         }
-                        
-                    },
-                    error: function(data){
-                        Swal.fire({
+                    });
+                }
+                else{
+                    console.log('false')
+                    Swal.fire({
                         title: 'Error!',
-                        text: 'There were errors while saving the data...',
-                        type: 'error'
-                        
-                        });
-                    }
-                });
+                        text: 'Please enter your valid youtube link.',
+                        type: 'error'                        
+                    });
+                }
                 
-            }else{
-               
+
             }
-            
-        });
+        })
 
         $('#btn_login').click(function(e){
             var valid = this.form.checkValidity();
@@ -116,7 +172,7 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true && $_SERVER['R
                                 type: 'success',
                             
                             });
-                            //window.setTimeout(function(){location.reload()},2000)
+                            window.setTimeout(function(){location.replace('index.php')},1000)
                         }else{
                             Swal.fire({
                                 title: 'Failed!',
@@ -143,6 +199,7 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true && $_SERVER['R
 
         
     })
+   
 </script>    
 </body>
 </html>
