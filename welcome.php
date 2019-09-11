@@ -44,6 +44,10 @@ require_once('process.php');
                     <div class="col-sm-12 col-md-6 col-lg-4">
                     <div class="movie-title"><h3>Movie Title</h3></div>
                         <div class="movie-author"><h6>Shared by: <?php echo $movies["$i"]['userEmail']?></h6> </div>
+                        <div class="movie-vote">
+                            <span class="voteup"></span>35<a href='#'><img src="img/voteup.png" alt=""></a>
+                            <span class="voteup"></span>5<a href='#'><img src="img/votedown.png" alt=""></a>
+                        </div>
                         <div class="movie-description"><h6>Description: </h6> </div>
                         <p>
                             Donec id elit non mi porta gravida at eget metus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
